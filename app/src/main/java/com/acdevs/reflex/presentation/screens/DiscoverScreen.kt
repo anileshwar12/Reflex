@@ -74,8 +74,8 @@ fun DiscoverScreen() {
     }
 }
 
-@Composable
 @Preview
-fun DiscoverScreenPreview() {
+@Composable
+fun DiscoverPreview() {
     DiscoverScreen()
 }

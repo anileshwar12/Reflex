@@ -7,8 +7,8 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -27,16 +27,23 @@ fun MainScreen() {
     Scaffold(
         bottomBar = {
             NavigationBar {
-                val currentDestination = navController.currentBackStackEntryAsState().value?.destination?.route
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentDestination = navBackStackEntry?.destination?.route
+
                 items.forEach { item ->
                     NavigationBarItem(
                         icon = { Icon(item.icon, contentDescription = item.title) },
                         label = { Text(item.title) },
-                        selected = currentDestination == item.title,
+                        selected = currentDestination?.startsWith(item.title) == true,
                         onClick = {
                             navController.navigate(item.title) {
-                                popUpTo(navController.graph.startDestinationId)
+
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
+                                }
+
                                 launchSingleTop = true
+                                restoreState = true
                             }
                         }
                     )
@@ -45,19 +52,13 @@ fun MainScreen() {
         }
     ) { innerPadding ->
         NavHost(
-            navController,
+            navController = navController,
             startDestination = NavigationItem.Discover.title,
-            Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding)
         ) {
             composable(NavigationItem.Discover.title) { DiscoverScreen() }
             composable(NavigationItem.Favourites.title) { FavouritesScreen() }
             composable(NavigationItem.Profile.title) { ProfileScreen() }
         }
     }
-}
-
-@Composable
-@Preview
-fun MainScreenPreview() {
-    MainScreen()
 }
